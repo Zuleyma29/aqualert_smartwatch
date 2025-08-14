@@ -20,10 +20,8 @@ class _LoginScreenState extends State<LoginScreen> {
   String _errorMessage = '';
   bool _isLoading = false;
 
-  // Función para validar código consultando Firebase Firestore
   Future<Map<String, String>?> _validateCodeFromFirebase(String code) async {
     try {
-      // Consultar la colección 'usuarios' donde 'id_unico' sea igual al código ingresado
       QuerySnapshot querySnapshot =
           await FirebaseFirestore.instance
               .collection('usuarios')
@@ -53,32 +51,24 @@ class _LoginScreenState extends State<LoginScreen> {
     for (var controller in _controllers) {
       controller.dispose();
     }
-    for (var focusNode in _focusNodes) {
-      focusNode.dispose();
+    for (var node in _focusNodes) {
+      node.dispose();
     }
     super.dispose();
   }
 
   void _onCodeChanged(String value, int index) {
-    if (value.length == 1 && index < 5) {
-      _focusNodes[index + 1].requestFocus();
-    } else if (value.isEmpty && index > 0) {
-      _focusNodes[index - 1].requestFocus();
-    }
+    if (value.length == 1 && index < 5) _focusNodes[index + 1].requestFocus();
+    if (value.isEmpty && index > 0) _focusNodes[index - 1].requestFocus();
 
-    // Verificar si todos los campos están llenos
-    if (_controllers.every((controller) => controller.text.isNotEmpty)) {
-      _verifyCode();
-    }
+    if (_controllers.every((c) => c.text.isNotEmpty)) _verifyCode();
   }
 
   void _verifyCode() async {
-    String code = _controllers.map((controller) => controller.text).join();
+    String code = _controllers.map((c) => c.text).join();
 
     if (code.length != 6) {
-      setState(() {
-        _errorMessage = 'Por favor, ingresa un código de 6 caracteres.';
-      });
+      setState(() => _errorMessage = 'Ingresa un código de 6 caracteres.');
       return;
     }
 
@@ -87,20 +77,17 @@ class _LoginScreenState extends State<LoginScreen> {
       _errorMessage = '';
     });
 
-    // Consultar Firebase para validar el código
     Map<String, String>? userData = await _validateCodeFromFirebase(code);
 
     if (userData != null) {
-      // Código válido - navegar a la pantalla principal
       HapticFeedback.lightImpact();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const TomeAguaScreen()),
       );
     } else {
-      // Código inválido
       HapticFeedback.heavyImpact();
       setState(() {
-        _errorMessage = 'Código inválido. Inténtalo de nuevo.';
+        _errorMessage = 'Código inválido.';
         _isLoading = false;
       });
       _clearCode();
@@ -108,167 +95,149 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _clearCode() {
-    for (var controller in _controllers) {
-      controller.clear();
-    }
+    for (var c in _controllers) c.clear();
     _focusNodes[0].requestFocus();
   }
 
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
-    final double shortestSide = screenSize.shortestSide;
-    // Optimizado para smartwatch - mejor escalado para pantallas pequeñas
-    final double scaleFactor =
-        shortestSide < 250 ? shortestSide / 150.0 : shortestSide / 200.0;
+    final double shortest = screenSize.shortestSide;
+    // Escala basada en pantalla
+    final double scale = shortest / 150;
 
     return Scaffold(
       backgroundColor: const Color(0xFFDCEEFF),
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10 * scaleFactor),
+            padding: EdgeInsets.symmetric(horizontal: 5 * scale),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo y título
+                  // Logo + título
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Image.asset(
                         'assets/images/ic_launcher.png',
-                        width: 30 * scaleFactor,
-                        height: 30 * scaleFactor,
+                        width: 20 * scale,
+                        height: 20 * scale,
                       ),
-                      SizedBox(width: 8 * scaleFactor),
+                      SizedBox(width: 4 * scale),
                       Text(
                         'Aqualert',
                         style: TextStyle(
-                          fontSize: 24 * scaleFactor,
-                          fontFamily: 'Georgia',
+                          fontSize: 16 * scale,
                           fontWeight: FontWeight.bold,
                           color: const Color(0xFF003366),
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
-                  SizedBox(height: 15 * scaleFactor),
+                  SizedBox(height: 8 * scale),
 
-                  // Título de autenticación
                   Text(
-                    'Ingresa tu código de acceso',
+                    'Ingresa tu código',
                     style: TextStyle(
-                      fontSize: 16 * scaleFactor,
+                      fontSize: 12 * scale,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xFF003366),
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 10 * scaleFactor),
+                  SizedBox(height: 6 * scale),
 
                   // Campos de código
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: List.generate(6, (index) {
-                      return Container(
-                        width: math.max(20 * scaleFactor, 30),
-                        height: math.max(30 * scaleFactor, 40),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color:
-                                _controllers[index].text.isNotEmpty
-                                    ? const Color(0xFF4A90E2)
-                                    : Colors.grey.shade300,
-                            width: 2,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
+                    children: List.generate(6, (i) {
+                      return Flexible(
+                        child: Container(
+                          height: 28 * scale,
+                          margin: EdgeInsets.symmetric(horizontal: 1.5),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color:
+                                  _controllers[i].text.isNotEmpty
+                                      ? const Color(0xFF4A90E2)
+                                      : Colors.grey.shade300,
+                              width: 1.5,
                             ),
-                          ],
-                        ),
-                        child: TextField(
-                          controller: _controllers[index],
-                          focusNode: _focusNodes[index],
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.text,
-                          maxLength: 1,
-                          style: TextStyle(
-                            fontSize: 18 * scaleFactor,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF003366),
                           ),
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            counterText: '',
-                          ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                              RegExp(r'[a-zA-Z0-9]'),
+                          child: TextField(
+                            controller: _controllers[i],
+                            focusNode: _focusNodes[i],
+                            textAlign: TextAlign.center,
+                            keyboardType: TextInputType.number,
+                            maxLength: 1,
+                            style: TextStyle(
+                              fontSize: 14 * scale,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF003366),
                             ),
-                          ],
-                          onChanged: (value) => _onCodeChanged(value, index),
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              counterText: '',
+                            ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'[0-9]'),
+                              ),
+                            ],
+                            onChanged: (v) => _onCodeChanged(v, i),
+                          ),
                         ),
                       );
                     }),
                   ),
-                  SizedBox(height: 10 * scaleFactor),
+                  SizedBox(height: 6 * scale),
 
-                  // Mensaje de error
+                  // Error
                   if (_errorMessage.isNotEmpty)
                     Container(
-                      padding: EdgeInsets.all(8 * scaleFactor),
+                      padding: EdgeInsets.all(4 * scale),
                       decoration: BoxDecoration(
                         color: Colors.red.shade50,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(6),
                         border: Border.all(color: Colors.red.shade200),
                       ),
                       child: Text(
                         _errorMessage,
                         style: TextStyle(
                           color: Colors.red.shade700,
-                          fontSize: 12 * scaleFactor,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 10 * scale,
                         ),
                         textAlign: TextAlign.center,
                       ),
                     ),
 
-                  SizedBox(height: 8 * scaleFactor),
+                  SizedBox(height: 4 * scale),
 
-                  // Indicador de carga
                   if (_isLoading)
                     SizedBox(
-                      width: 20 * scaleFactor,
-                      height: 20 * scaleFactor,
+                      width: 16 * scale,
+                      height: 16 * scale,
                       child: const CircularProgressIndicator(
                         strokeWidth: 2,
                         color: Color(0xFF4A90E2),
                       ),
                     ),
 
-                  SizedBox(height: 15 * scaleFactor),
+                  SizedBox(height: 6 * scale),
 
                   // Información adicional
                   Text(
-                    'Código de 6 dígitos',
+                    '6 dígitos, solo números',
                     style: TextStyle(
-                      fontSize: 12 * scaleFactor,
+                      fontSize: 8 * scale,
                       color: Colors.grey.shade600,
                     ),
-                  ),
-                  SizedBox(height: 5 * scaleFactor),
-                  Text(
-                    'Solo números',
-                    style: TextStyle(
-                      fontSize: 10 * scaleFactor,
-                      color: Colors.grey.shade500,
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
