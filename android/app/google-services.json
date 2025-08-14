@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1052807036864",
+    "project_id": "aqualert-c72a5",
+    "storage_bucket": "aqualert-c72a5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1052807036864:android:49899bd27844c812171225",
+        "android_client_info": {
+          "package_name": "com.example.aqualert"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGJMzPjgx70dk4DSJaUvqniqYNzS9q-L0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1052807036864:android:f6e7693315e2aa8f171225",
+        "android_client_info": {
+          "package_name": "com.example.aqualert_smartwatch"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGJMzPjgx70dk4DSJaUvqniqYNzS9q-L0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
