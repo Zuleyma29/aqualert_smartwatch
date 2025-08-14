@@ -1,0 +1,35 @@
+name: aqualert_smartwatch
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  fl_chart: ^1.0.0
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.2.2
+
+  flutter_local_notifications: ^17.1.0
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1  
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/ic_launcher.png
+
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/images/ic_launcher.png
